@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Event Agent</title>
+</head>
+<body>
+	<h1>Event Agent</h1>
+	<ul id="test">
+		<li><a href="#">111</a></li>
+		<li><a href="#">222</a></li>
+		<li><a href="#">333</a></li>
+		<li><a href="#">444</a></li>
+	</ul>
+
+	<script src="./eventAgent.js"></script>
+	<script>
+		var ul = document.getElementById('test')
+		ul.on('click', 'a', function(e) {
+			console.log(this.innerHTML)
+		})
+	</script>
+</body>
+</html>
