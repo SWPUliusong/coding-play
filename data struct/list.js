@@ -1,3 +1,5 @@
+'use strict'
+
 function List() {
   this.listSize = 0;  //元素个数
   this.pos = 0;  //列表当前位置
@@ -12,7 +14,7 @@ List.prototype.append = function(elem) {
 //查找某元素
 List.prototype.find = function(elem) {
   var len = this.listSize;
-  for (var i = 0; i < len; i++) {
+  for (let i = 0; i < len; i++) {
     if (this.dataStore[i] === elem) {
       return i;
     }
@@ -50,7 +52,7 @@ List.prototype.insert = function(elem, after) {
 //判断是否在列表中
 List.prototype.contains = function(elem) {
   var len = this.listSize;
-  for (var i = 0; i < len; i++) {
+  for (let i = 0; i < len; i++) {
     if (this.dataStore[i] === elem) {
       return true;
     }

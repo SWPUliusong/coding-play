@@ -83,21 +83,21 @@
 // l.display()
 
 //统计
-function count (str) {
-  var obj = Object.create(null)
-  str.split(' ').forEach(function(item) {
-    if (item in obj) {
-      obj[item]++
-    } else {
-      obj[item] = 1
-    }
-  })
-  return obj
-}
+// function count (str) {
+//   var obj = Object.create(null)
+//   str.split(' ').forEach(function(item) {
+//     if (item in obj) {
+//       obj[item]++
+//     } else {
+//       obj[item] = 1
+//     }
+//   })
+//   return obj
+// }
 
 // console.log(count('the brown fox jumped over the blue fox'))
 
-const LoopLList = require("./loopLinkedList")
+// const LoopLList = require("./loopLinkedList")
 
 // var loopLL = new LoopLList()
 // loopLL.insert(4, 'head')
@@ -106,12 +106,59 @@ const LoopLList = require("./loopLinkedList")
 // loopLL.remove(1)
 // loopLL.display()
 
-function loop(n, m) {
-  if (n === 1) {
-    return 0
-  }
+// function loop(n, m) {
+//   if (n === 1) {
+//     return 0
+//   }
 
-  return (loop(n-1, m) + m) % n
-}
+//   return (loop(n-1, m) + m) % n
+// }
 
-console.log(loop(40, 3) + 1)
+// console.log(loop(40, 3) + 1)
+
+/*二叉搜索树*/
+// const BST = require("./BST")
+
+// var tree = new BST()
+
+// tree.insert(10)
+// tree.insert(30)
+// tree.insert(22)
+// tree.insert(54)
+// tree.insert(12)
+// tree.insert(24)
+
+// console.log('中序遍历')
+// tree.inOrder(tree.root, (val) => {
+//   process.stdout.write(val.toString() + '\t')
+// })
+// console.log('\n前序遍历')
+// tree.preOrder(tree.root, (val) => {
+//   process.stdout.write(val.toString() + '\t')
+// })
+// console.log('\n后序遍历')
+// tree.postOrder(tree.root, (val) => {
+//   process.stdout.write(val.toString() + '\t')
+// })
+// console.log('\n最大值')
+// console.log(tree.max())
+// console.log('最小值')
+// console.log(tree.min())
+
+
+// 图
+const Graph = require('./graph')
+
+var g = new Graph(4)
+g.addEdge(1, 2)
+  .addEdge(1, 3)
+  .addEdge(2, 4)
+  .showGraph()
+  .bfs(1, (v) => {
+    process.stdout.write(v + '\t')
+  })
+
+console.log('\n')
+g.reset().dfs(2, (v) => {
+  process.stdout.write(v + '\t')
+})
