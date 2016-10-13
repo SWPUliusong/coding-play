@@ -20,6 +20,7 @@ Stack.prototype.size = function() {
 }
 
 Stack.prototype.clear = function() {
+  this.data = [];
   this.top = 0;
 }
 
