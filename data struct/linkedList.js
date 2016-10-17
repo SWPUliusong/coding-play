@@ -1,11 +1,12 @@
 'use strict'
 
-function Node(elem) {
-  this.element = elem;
-  this.next = null;
-}
-
 function LList() {
+  // 节点对象
+  function Node(elem) {
+    this.element = elem;
+    this.next = null;
+  }
+
   this.head = new Node('head')
   this.find = find
   this.insert = insert

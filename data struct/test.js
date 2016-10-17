@@ -1,3 +1,5 @@
+'use strict'
+
 // /*列表*/
 // var List = require('./list')
 
@@ -33,7 +35,7 @@
 // console.log(stack.pop())
 // console.log(stack.pop())
 // console.log(stack.pop())
-// console.log(stack.size())
+// console.log(stack.size)
 // console.log(stack.data)
 
 // function swift(num, base) {
@@ -55,8 +57,7 @@
 // console.log(swift(255, 2))
 
 
-// /*队列*/
-
+/*队列*/
 // const Queue = require("./queue")
 
 // var q = new Queue()
@@ -65,8 +66,24 @@
 // q.enqueue(3)
 // q.enqueue(4)
 // console.log(q.toString())
-// console.log(q.front())
-// console.log(q.end())
+// console.log(q.front)
+// console.log(q.end)
+// console.log(q.isEmpty())
+// console.log(q.length)
+
+// // 约瑟夫环
+// function joseph(queue, num) {
+//   while (queue.size > 1) {
+//     for (let i = 0; i < num - 1; i++) {         
+//       queue.enqueue(queue.dequeue())
+//     }
+//     queue.dequeue()
+//   }
+//   return queue.dequeue()
+// }
+
+// var qq = new Queue([1,2,3,4,5,6,7,8,9])
+// console.log(joseph(qq, 2))
 
 
 /*链表*/
@@ -81,6 +98,14 @@
 // l.display()
 // l.remove(3)
 // l.display()
+
+
+// 集合
+const Coll = require('./collection.js')
+var s = new Coll()
+s.add(1).add(2).add(3).add(4).add('1')
+console.log(s.values)
+
 
 //统计
 // function count (str) {
@@ -147,18 +172,15 @@
 
 
 // 图
-const Graph = require('./graph')
+// const Graph = require('./graph')
 
-var g = new Graph(4)
-g.addEdge(1, 2)
-  .addEdge(1, 3)
-  .addEdge(2, 4)
-  .showGraph()
-  .bfs(1, (v) => {
-    process.stdout.write(v + '\t')
-  })
+// var g = new Graph(4)
+// g.addEdge(1, 2)
+//   .addEdge(1, 3)
+//   .addEdge(2, 4)
+//   .showGraph()
 
-console.log('\n')
-g.reset().dfs(2, (v) => {
-  process.stdout.write(v + '\t')
-})
+// console.log('\n')
+// g.reset().dfs(2, (v) => {
+//   process.stdout.write(v + '\t')
+// })
