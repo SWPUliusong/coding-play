@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>jsonp</title>
+</head>
+<body>
+	<button onclick="getMsg1()">jsonp</button>
+	<button onclick="getMsg2()">cors</button>
+
+	<script>
+		function dataParse(data) {
+			console.log(data.name)
+		}
+
+		function jsonp(url) {
+			var script = document.createElement('script')
+			script.src = url
+			document.head.appendChild(script)
+			script.onload = function() {
+				this.parentNode.removeChild(this)
+			}
+		}
+
+		function getMsg1() {
+			jsonp('http://localhost:3000?callback=dataParse')
+		}
+
+		function getMsg2() {
+			var xhr = new XMLHttpRequest()
+			xhr.open('GET', 'http://localhost:3000')
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState === 4) {
+					if (xhr.status === 200) {
+						var data = JSON.parse(xhr.responseText)
+						console.log(data.name)
+					}
+				}
+			}
+			xhr.send(null)
+		}
+	</script>
+</body>
+</html>
