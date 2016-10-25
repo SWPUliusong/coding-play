@@ -1,10 +1,12 @@
 (function(root){
   'use strict'
   // 兼容不支持bind方法的环境
-  Object.prototype.bind = Object.prototype.bind || function(cxt) {
-    var self = this
-    return function() {
-      self.apply(cxt, arguments)
+  Function.prototype.bind = Function.prototype.bind || function(cxt) {
+    let fn = this
+    let arg1 = [].slice.call(arguments, 1)
+    return function () {
+      let arg2 = [].slice.call(arguments)
+      return fn.apply(cxt, arg1.concat(arg2))
     }
   }
 
