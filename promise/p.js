@@ -35,7 +35,6 @@
   // 直接转交失败原因
   P.reject = function(data) {
     return new P(function(resolve, reject) {
-      // 延时等待任务队列转交
       setTimeout(function() {
         reject(data)
       }, 0)
@@ -44,30 +43,37 @@
 
   // 批处理
   P.all = function(arr) {
+    // 如果全部都不是Promise,则直接当成数据转交handler
+    if (!arr.some(p => p.isPromise)) {
+      return P.resolve(arr)
+    }
+
     return new P(function(resolve, reject) {
-      if (arr instanceof Array) {
-        reject('P.all need a Array')
-      }
-
-      let res = [],   // 存储结果
-        pending = 0;  // 记录状态
-
-      arr.forEach((p, i) => {
-        if (p.isPromise) {
-          pending++   // 注册异步任务时 +1
-          p.then((data) => {
-            pending--   // 完成异步任务时 -1
-            res[i] = data
-            if (pending === 0) {  // 为0时，全部完成
-              resolve(res)
-            }
-          })
-        } else {
-          // 不是Promise则直接当成数据
-          res[i] = p
+      setTimeout(function() {
+        if (!(arr instanceof Array)) {
+          return reject('P.all need a Array')
         }
-      })
-    })
+
+        let res = [],   // 存储结果
+          pending = 0;  // 记录状态
+
+        arr.forEach((p, i) => {
+          if (p.isPromise) {
+            pending++   // 注册异步任务时 +1
+            p.then((data) => {
+              pending--   // 完成异步任务时 -1
+              res[i] = data
+              if (pending === 0) {  // 为0时，全部完成
+                resolve(res)
+              }
+            })
+          } else {
+            // 不是Promise则直接当成数据
+            res[i] = p
+          }
+        })
+      }, 0)
+    })   
   }
   
   // 成功态
