@@ -12,39 +12,26 @@
 		function test1() {
 		    return new P(function(resolve, reject) {
 		        setTimeout(function() {
-		      		resolve(123)
+		      		resolve(100)
 		      	}, 1000)
 		    })
 		}
 
-		function test2() {
-		  	return new P(function(resolve, reject) {
-		    	setTimeout(function() {
-		      		reject("404")
-		    	}, 300)
-		  	})
-		}
-
-		test1().then(function(data) {
-		  	console.log("1: " + data)
-		  	return test1()
+		P.all([test1(), 236, test1()])
+		.then(function(data) {
+		  console.log(data)
+		  return test1()
 		})
 		.then(function(data) {
-		  	console.log("1: " + (data + 345))
-		})
-		.catch(function(err) {
-		  	console.log("1: " + err)
-		})
-
-		test1().then(function(data) {
-		  	console.log("2: " + data)
-		  	return test2()
+		  console.log(data)
+		  return P.resolve(200)
 		})
 		.then(function(data) {
-		  	console.log("2: " + (data + 345))
+		  console.log(data)
+		  return P.reject(500)
 		})
 		.catch(function(err) {
-		  	console.log("2: " + err)
+		  console.log(err)
 		})
 
 		console.log(P.author)
