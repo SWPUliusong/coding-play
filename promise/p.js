@@ -1,4 +1,4 @@
-(function(root){
+;(function(root){
   'use strict'
   // 兼容不支持bind方法的环境
   Function.prototype.bind = Function.prototype.bind || function(cxt) {
@@ -43,7 +43,7 @@
 
   // 批处理
   P.all = function(arr) {
-    // 如果全部都不是Promise,则直接当成数据转交handler
+    // 如果全部都不是Promise,则直接当成数据转交给handler
     if (!arr.some(p => p.isPromise)) {
       return P.resolve(arr)
     }
