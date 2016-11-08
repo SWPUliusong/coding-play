@@ -35,6 +35,17 @@
 		})
 
 		console.log(P.author)
+
+		function p(n) {
+		  return new P((resolve, reject) => {
+		    resolve(n + 123)
+		    if (typeof n === 'number') {
+		      reject(n)
+		    }
+		  })
+		}
+
+		p(123).then(res => console.log(res)).catch(err => console.log(err))
 	</script>
 </body>
 </html>
