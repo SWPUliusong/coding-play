@@ -34,3 +34,4 @@ exec(function* (){
   }
 })
 
+console.log('start')

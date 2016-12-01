@@ -28,7 +28,7 @@ function exec(gen) {
     }
   }
 
-  next()
+  setTimeout(next, 0)
 }
 
 module.exports = exec
