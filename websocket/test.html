@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
 </head>
+
 <body>
-	
+
 	<script>
-		var ws=new WebSocket("ws://127.0.0.1:5000");
-		ws.onerror=function(e){
-		    console.log(e);
+		var ws = new WebSocket("ws://127.0.0.1:5000");
+		ws.onerror = function (e) {
+			console.log(e);
 		};
-		ws.onopen=function(){
-		    console.log("握手成功");
+		ws.onopen = function () {
+			console.log("握手成功");
+			ws.send('hello')
 		};
 	</script>
 </body>
+
 </html>
