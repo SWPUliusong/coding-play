@@ -1,6 +1,8 @@
 const net = require("net")
 const crypto = require("crypto")
 
+let decodeData = require("./decodeData")
+
 // 加密Sec-WebSocket-Key的固定字符串
 let mask = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11'
 
@@ -26,5 +28,6 @@ net.createServer(socket => {
 })
 
 function onmessage(data) {
+	data = decodeData(data)
 	console.log(data)
 }

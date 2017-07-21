@@ -5,18 +5,29 @@
 	<meta charset="UTF-8">
 	<title>Document</title>
 </head>
-
+	<input type="text" id="msg">
+	<button onclick="postMsg()">发送</button>
 <body>
 
+	<form method="POST" enctype="multipart/form-data" action="http://172.28.24.161:19505/version/psgcars/domianName/import?batchName=测试&batchDescription=测试 ">            
+		<input type="file" name="file" />
+		<input type="submit" value="上传" />
+    </form>
+
 	<script>
-		var ws = new WebSocket("ws://127.0.0.1:5000");
+		let ws = new WebSocket("ws://127.0.0.1:5000");
+		let input = document.getElementById('msg')
 		ws.onerror = function (e) {
 			console.log(e);
 		};
 		ws.onopen = function () {
 			console.log("握手成功");
-			ws.send('hello')
+			ws.send('hello, 世界')
 		};
+		function postMsg() {
+			ws.send(input.value)
+			input.value = ''
+		}
 	</script>
 </body>
 
