@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+
+<body>
+	<input type="text" id="msg">
+	<button onclick="postMsg()">发送</button>
+
+	<button onclick="wsConnect()">连接webSocket</button>
+
+	<script>
+		let input = document.getElementById('msg')
+		let ws
+
+		function wsConnect() {
+			if (ws) return
+			ws = new WebSocket("ws://localhost:5000/websocket");
+
+			ws.onerror = function (e) {
+				console.log(e);
+			};
+			ws.onopen = function () {
+				console.log("握手成功");
+				ws.send('hello, 世界')
+			};
+			ws.onmessage = function (e) {
+				console.log(e)
+			}
+			ws.onclose = function (e) {
+				console.log(e)
+				ws.close()
+			}
+		}
+		function postMsg() {
+			ws.send(input.value)
+			input.value = ''
+		}
+	</script>
+</body>
+
+</html>

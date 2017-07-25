@@ -1,0 +1,19 @@
+{
+  "name": "websocket",
+  "version": "1.0.0",
+  "description": "nodejs实现websocket协议",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SWPUliusong/websocket.git"
+  },
+  "author": "SWPUliusong",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SWPUliusong/websocket/issues"
+  },
+  "homepage": "https://github.com/SWPUliusong/websocket#readme"
+}
