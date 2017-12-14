@@ -1,7 +1,7 @@
-let { createHash } = require("crypto")
-let { Readable } = require("stream")
-let decodeData = require("./decodeData")
-let encodeData = require("./encodeData")
+const { createHash } = require("crypto")
+const { Readable } = require("stream")
+const decodeData = require("./decodeData")
+const encodeData = require("./encodeData")
 // 加密Sec-WebSocket-Key的固定字符串
 let mask = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11'
 
