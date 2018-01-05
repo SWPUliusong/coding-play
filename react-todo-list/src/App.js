@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-import { todosStore } from "./stores"
+import React, { Component } from 'react'
 import { AddTodo } from "./components/AddTodo"
 import { ShowTodos } from "./components/ShowTodos"
 import { Filter } from "./components/Filter"
