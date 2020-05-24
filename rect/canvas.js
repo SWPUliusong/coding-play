@@ -21,24 +21,18 @@ class Canvas {
     this.ctx = elem.getContext("2d")
 
     elem.addEventListener("mousemove", e => {
-      let x = e.offsetX
-      let y = e.offsetY
-      // 已经按下鼠标则拖动画框
-      if (isMouseDown) {
-        self.axis = self.axis.filter(item => item !== dragRect)
+      let x = this.x = e.offsetX
+      let y = this.y = e.offsetY
 
-
+      // 监听是否进入画框内,进入触发拖动，没有进入则画框
+      let axis = this.axis
+      let rect = axis.find(item => {
+        return this.isPointInRect(item, x, y)
+      })
+      if (!!rect) {
+        elem.style.cursor = "move"
       } else {
-        // 没有按下鼠标，则监听是否进入画框内
-        let axis = self.axis
-        dragRect = axis.find(item => {
-          return self.isPointInRect(item, x, y)
-        })
-        if (!!dragRect) {
-          elem.style.cursor = "move"
-        } else {
-          elem.style.cursor = "crosshair"
-        }
+        elem.style.cursor = "crosshair"
       }
 
     })
