@@ -1,3 +1,29 @@
+class EventBus {
+  eventMap = {}
+
+  on(eventName, cb) {
+    let cbs = this.eventMap[eventName] || []
+    cbs.push(cb)
+    this.eventMap[eventName] = cbs
+    return () => {
+      let cbs = this.eventMap[eventName]
+      cbs = cbs.filter(item => item !== cb)
+      if (cbs.length === 0) {
+        delete this.eventMap[eventName]
+      } else {
+        this.eventMap[eventName] = cbs
+      }
+    }
+  }
+
+  emit(eventName, payLoad) {
+    let cbs = this.eventMap[eventName]
+    if (!!cbs && !!cbs.length) {
+      cbs.forEach(cb => cb(payLoad))
+    }
+  }
+}
+
 // action类型
 const Marks = {
   drawRect: "DrawRect",
@@ -8,9 +34,18 @@ class Canvas {
   // 坐标框集合
   axis = []
 
+  event = new EventBus()
+
   // 鼠标现在的位置
   x = 0
   y = 0
+
+  // 状态，处于绘画还是拖动
+  state = ""
+
+  // 拖动的目标在axis中的索引
+  dragIndex = -1
+
   /**
    * 初始化canvas
    * @param {HTMLCanvasElement} elem canvas元素
@@ -20,23 +55,66 @@ class Canvas {
     elem.style.cursor = "crosshair"
     this.ctx = elem.getContext("2d")
 
+    let isMouseDown = false
+    // 画框的起始点
+    let startX, startY
+    elem.addEventListener("mousedown", e => {
+      isMouseDown = true
+      startX = e.offsetX
+      startY = e.offsetY
+    })
+
+    elem.addEventListener("mouseup", e => {
+      isMouseDown = false
+      if (this.state === Marks.drawRect) {
+        let endX = e.offsetX
+        let endY = e.offsetY
+        this.axis.push(this.getPoints(startX, startY, endX, endY))
+      }
+    })
+
     elem.addEventListener("mousemove", e => {
       let x = this.x = e.offsetX
       let y = this.y = e.offsetY
-
-      // 监听是否进入画框内,进入触发拖动，没有进入则画框
+      // 当前鼠标是按下的，则触发对应事件
+      if (isMouseDown) {
+        return this.event.emit(
+          this.state,
+          this.getPoints(startX, startY, x, y)
+        )
+      }
+      // 如果鼠标没有按下，则根据鼠标位置，改变状态
+      // 监听是否进入画框内,进入触发拖动，没有进入则触发画框
       let axis = this.axis
       let rect = axis.find(item => {
         return this.isPointInRect(item, x, y)
       })
       if (!!rect) {
+        this.dragIndex = axis.indexOf(rect)
         elem.style.cursor = "move"
+        this.state = Marks.dragRect
       } else {
         elem.style.cursor = "crosshair"
+        this.state = Marks.drawRect
       }
-
     })
 
+
+    this.event.on(Marks.drawRect, ({ startX, startY, endX, endY }) => {
+      this.resetLayer()
+      this.drawRect(startX, startY, endX, endY)
+    })
+
+    this.event.on(Marks.dragRect, ({ startX, startY, endX, endY }) => {
+      let rect = this.axis[this.dragIndex]
+      console.log(rect)
+      rect.startX = rect.startX + (endX - startX)
+      rect.startY = rect.startY + (endY - startY)
+      rect.endX = rect.endX + (endX - startX)
+      rect.endY = rect.endY + (endY - startY)
+      console.log(rect)
+      this.resetLayer()
+    })
   }
 
   // 重置图层
@@ -81,146 +159,5 @@ class Canvas {
 
     return x >= startX && x <= endX && y >= startY && y <= endY
   }
-
-  /**
-  * 绑定划框的action
-  * @param {Funtion} handler 控制器
-  */
-  addDrawRectEvent(handler = () => { }) {
-    const elem = this.canvasElem
-    // action类型标记
-    let mark = "DrawRect"
-    let isMouseDown = false
-    // 画框的起始点
-    let startX, startY
-
-    let self = this
-
-    function mousedownHandler(e) {
-      // 对比标记，防止其他mousedown事件触发控制器
-      if (mark === Marks.drawRect) {
-        isMouseDown = true
-        startX = e.offsetX
-        startY = e.offsetY
-      }
-    }
-
-    function mousemoveHandler(e) {
-      // 对比标记，防止其他mousemove事件触发控制器
-      if (mark === Marks.drawRect && isMouseDown) {
-        let endX = e.offsetX
-        let endY = e.offsetY
-
-        self.resetLayer()
-        self.drawRect(startX, startY, endX, endY)
-
-      }
-    }
-
-    function mouseupHandler(e) {
-      // 对比标记，防止其他mouseup事件触发控制器
-      if (mark === Marks.drawRect && isMouseDown) {
-        isMouseDown = false
-        let endX = e.offsetX
-        let endY = e.offsetY
-        self.axis.push(self.getPoints(startX, startY, endX, endY))
-        handler(self.getPoints(startX, startY, endX, endY))
-      }
-    }
-
-    elem.addEventListener("mousedown", mousedownHandler)
-
-    elem.addEventListener("mousemove", mousemoveHandler)
-
-    elem.addEventListener("mouseup", mouseupHandler)
-
-    // 返回能取消事件绑定的函数
-    return () => {
-      elem.removeEventListener("mousedown", mousedownHandler)
-      elem.removeEventListener("mousemove", mousemoveHandler)
-      elem.removeEventListener("mouseup", mouseupHandler)
-    }
-  }
-
-  /**
-  * 绑定拖动线框的action
-  * @param {Funtion} handler 控制器
-  */
-  addDragRectEvent(handler = () => { }) {
-    const elem = this.canvasElem
-    // action类型标记
-    let mark = "DragRect"
-    let isMouseDown = false
-
-    // 画框拖动的起始点
-    let startX, startY
-
-    // 被拖动的线框
-    let dragRect = null
-
-    let self = this
-
-
-    function mousemoveHandler(e) {
-      let x = e.offsetX
-      let y = e.offsetY
-      // 对比标记，防止其他mousemove事件触发控制器
-      if (mark === Marks.dragRect) {
-        // 已经按下鼠标则拖动画框
-        if (isMouseDown) {
-          self.axis = self.axis.filter(item => item !== dragRect)
-
-
-        } else {
-          // 没有按下鼠标，则监听是否进入画框内
-          let axis = self.axis
-          dragRect = axis.find(item => {
-            return self.isPointInRect(item, x, y)
-          })
-          if (!!dragRect) {
-            elem.style.cursor = "move"
-          } else {
-            elem.style.cursor = "crosshair"
-          }
-        }
-
-      }
-    }
-
-    function mousedownHandler(e) {
-      // 对比标记，防止其他mousedown事件触发控制器
-      if (mark === Marks.dragRect) {
-        isMouseDown = true
-        startX = e.offsetX
-        startY = e.offsetY
-      }
-    }
-
-    function mouseupHandler(e) {
-      // 对比标记，防止其他mouseup事件触发控制器
-      if (mark === Marks.dragRect && isMouseDown) {
-        isMouseDown = false
-        let endX = e.offsetX
-        let endY = e.offsetY
-        self.axis.push(self.getPoints(startX, startY, endX, endY))
-        handler(self.getPoints(startX, startY, endX, endY))
-      }
-    }
-
-    elem.addEventListener("mousemove", mousemoveHandler)
-
-    elem.addEventListener("mousedown", mousedownHandler)
-
-    // elem.addEventListener("mouseup", mouseupHandler)
-
-    // 返回能取消事件绑定的函数
-    return () => {
-      elem.removeEventListener("mousedown", mousedownHandler)
-      elem.removeEventListener("mousemove", mousemoveHandler)
-      // elem.removeEventListener("mouseup", mouseupHandler)
-    }
-  }
-
-
 
 }
