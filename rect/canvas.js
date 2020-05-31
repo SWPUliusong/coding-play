@@ -32,18 +32,14 @@ const Marks = {
 
 class Canvas {
   // 坐标框集合
-  axis = []
+  rects = []
 
   event = new EventBus()
-
-  // 鼠标现在的位置
-  x = 0
-  y = 0
 
   // 状态，处于绘画还是拖动
   state = ""
 
-  // 拖动的目标在axis中的索引
+  // 拖动的目标在rects中的索引
   dragIndex = -1
 
   /**
@@ -66,31 +62,41 @@ class Canvas {
 
     elem.addEventListener("mouseup", e => {
       isMouseDown = false
+      let endX = e.offsetX
+      let endY = e.offsetY
       if (this.state === Marks.drawRect) {
-        let endX = e.offsetX
-        let endY = e.offsetY
-        this.axis.push(this.getPoints(startX, startY, endX, endY))
+        this.rects.push(this.getPoints(startX, startY, endX, endY))
+      } else if (this.state === Marks.dragRect) {
+        let rect = this.rects[this.dragIndex]
+        let x1 = rect.startX + (endX - startX)
+        let y1 = rect.startY + (endY - startY)
+        let x2 = rect.endX + (endX - startX)
+        let y2 = rect.endY + (endY - startY)
+        this.rects[this.dragIndex] = this.getPoints(x1, y1, x2, y2)
       }
     })
 
     elem.addEventListener("mousemove", e => {
-      let x = this.x = e.offsetX
-      let y = this.y = e.offsetY
+      let x = e.offsetX
+      let y = e.offsetY
       // 当前鼠标是按下的，则触发对应事件
       if (isMouseDown) {
         return this.event.emit(
           this.state,
-          this.getPoints(startX, startY, x, y)
+          { startX, startY, endX: x, endY: y }
         )
       }
       // 如果鼠标没有按下，则根据鼠标位置，改变状态
       // 监听是否进入画框内,进入触发拖动，没有进入则触发画框
-      let axis = this.axis
-      let rect = axis.find(item => {
-        return this.isPointInRect(item, x, y)
+      let rects = this.rects
+      let rect = null
+      rects.forEach((item, i) => {
+        if (this.isPointInRect(item, x, y)) {
+          rect = item
+          this.dragIndex = i
+        }
       })
       if (!!rect) {
-        this.dragIndex = axis.indexOf(rect)
         elem.style.cursor = "move"
         this.state = Marks.dragRect
       } else {
@@ -101,30 +107,31 @@ class Canvas {
 
 
     this.event.on(Marks.drawRect, ({ startX, startY, endX, endY }) => {
-      this.resetLayer()
+      this.resetLayer(this.rects)
       this.drawRect(startX, startY, endX, endY)
     })
 
     this.event.on(Marks.dragRect, ({ startX, startY, endX, endY }) => {
-      let rect = this.axis[this.dragIndex]
-      console.log(rect)
-      rect.startX = rect.startX + (endX - startX)
-      rect.startY = rect.startY + (endY - startY)
-      rect.endX = rect.endX + (endX - startX)
-      rect.endY = rect.endY + (endY - startY)
-      console.log(rect)
-      this.resetLayer()
+      // 选中的框
+      let rect = this.rects[this.dragIndex]
+      // 获取选中以外的其他框
+      let rectsOther = this.rects.filter((item, i) => i !== this.dragIndex)
+      let x1 = rect.startX + (endX - startX)
+      let y1 = rect.startY + (endY - startY)
+      let x2 = rect.endX + (endX - startX)
+      let y2 = rect.endY + (endY - startY)
+      this.resetLayer(rectsOther)
+      this.drawRect(x1, y1, x2, y2)
     })
   }
 
   // 重置图层
-  resetLayer() {
+  resetLayer(rects) {
     const ctx = this.ctx
     const elem = this.canvasElem
-    const axis = this.axis
     ctx.clearRect(0, 0, elem.width, elem.height)
-    if (!!axis.length) {
-      axis.forEach(item => {
+    if (!!rects && !!rects.length) {
+      rects.forEach(item => {
         let { startX, startY, endX, endY } = item
         ctx.strokeRect(startX, startY, endX - startX, endY - startY)
       })
@@ -158,6 +165,17 @@ class Canvas {
     let { startX, startY, endX, endY } = rect
 
     return x >= startX && x <= endX && y >= startY && y <= endY
+  }
+
+  // 获取绘好的线框
+  getRects() {
+    return this.rects
+  }
+
+  // 设置线框
+  setRects(rects = []) {
+    this.rects = rects
+    this.resetLayer(rects)
   }
 
 }

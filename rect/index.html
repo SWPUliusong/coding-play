@@ -24,19 +24,25 @@
     <canvas id="rect-canvas" width="1200" height="570"></canvas>
   </div>
 
+  <button onclick="setting()">设置</button>
+  <button onclick="submit()">提交</button>
+
   <!-- <script src="./addEvent.js"></script> -->
   <script src="./canvas.js"></script>
 
   <script>
     let canvas = new Canvas(document.getElementById("rect-canvas"))
 
-    // canvas.addDrawRectEvent(points => {
-    //   console.log(points)
-    // })
-    
-    // canvas.addDragRectEvent(points => {
-    //   console.log(points)
-    // })
+    function setting() {
+      console.log(canvas.setRects([
+        { startX: 415, startY: 143, endX: 570, endY: 241 },
+        { startX: 588, startY: 118, endX: 909, endY: 217 },
+        { startX: 422, startY: 275, endX: 736, endY: 485 }
+      ]))
+    }
+    function submit() {
+      console.log(canvas.getRects())
+    }
   </script>
 </body>
 
