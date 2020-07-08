@@ -169,7 +169,7 @@ class Canvas {
 
   // 获取绘好的线框
   getRects() {
-    return this.rects
+    return JSON.parse(JSON.stringify(this.rects))
   }
 
   // 设置线框
