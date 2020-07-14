@@ -134,6 +134,25 @@ class Canvas {
       rects.forEach(item => {
         let { startX, startY, endX, endY } = item
         ctx.strokeRect(startX, startY, endX - startX, endY - startY)
+        // 设置缩放的小框
+        ctx.fillStyle = "#fff";
+        let width = 6
+        // top-left
+        ctx.fillRect(startX - width / 2, startY - width / 2, width, width)
+        // top-center
+        ctx.fillRect((startX + endX) / 2 - width / 2, startY - width / 2, width, width)
+        // top-right
+        ctx.fillRect(endX - width / 2, startY - width / 2, width, width)
+        // right-center
+        ctx.fillRect(endX - width / 2, (startY + endY) / 2 - width / 2, width, width)
+        // bottom-right
+        ctx.fillRect(endX - width / 2, endY - width / 2, width, width)
+        // bottom-center
+        ctx.fillRect((startX + endX) / 2 - width / 2, endY - width / 2, width, width)
+        // bottom-left
+        ctx.fillRect(startX - width / 2, endY - width / 2, width, width)
+        // bottom-center
+        ctx.fillRect(startX - width / 2, (startY + endY) / 2 - width / 2, width, width)
       })
     }
   }
