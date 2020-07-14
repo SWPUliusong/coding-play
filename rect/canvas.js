@@ -30,7 +30,7 @@ const Marks = {
   dragRect: "DragRect",
 }
 
-class Canvas {
+export default class Canvas extends EventBus {
   // 坐标框集合
   rects = []
 
@@ -42,13 +42,21 @@ class Canvas {
   // 拖动的目标在rects中的索引
   dragIndex = -1
 
+  // 事件和控制器的映射表
+  eventMap = {}
+
+  // 是否禁用动作
+  disabled = false
+
   /**
    * 初始化canvas
    * @param {HTMLCanvasElement} elem canvas元素
    */
   constructor(elem) {
+    super()
     this.canvasElem = elem
     elem.style.cursor = "crosshair"
+    elem.style.color = "#fff"
     this.ctx = elem.getContext("2d")
 
     let isMouseDown = false
@@ -74,6 +82,8 @@ class Canvas {
         let y2 = rect.endY + (endY - startY)
         this.rects[this.dragIndex] = this.getPoints(x1, y1, x2, y2)
       }
+      this.resetLayer(this.rects)
+      this.emit("change", JSON.parse(JSON.stringify(this.rects)))
     })
 
     elem.addEventListener("mousemove", e => {
@@ -128,11 +138,14 @@ class Canvas {
   // 重置图层
   resetLayer(rects) {
     const ctx = this.ctx
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 3;
     const elem = this.canvasElem
     ctx.clearRect(0, 0, elem.width, elem.height)
     if (!!rects && !!rects.length) {
       rects.forEach(item => {
         let { startX, startY, endX, endY } = item
+        // 大框
         ctx.strokeRect(startX, startY, endX - startX, endY - startY)
         // 设置缩放的小框
         ctx.fillStyle = "#fff";
@@ -160,6 +173,8 @@ class Canvas {
   // 画框
   drawRect(startX, startY, endX, endY) {
     const ctx = this.ctx
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 3;
     ctx.beginPath()
     ctx.moveTo(startX, startY)
     ctx.lineTo(endX, startY)
@@ -193,7 +208,7 @@ class Canvas {
 
   // 设置线框
   setRects(rects = []) {
-    this.rects = rects
+    this.rects = JSON.parse(JSON.stringify(rects))
     this.resetLayer(rects)
   }
 
