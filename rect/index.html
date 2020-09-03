@@ -8,30 +8,37 @@
   <title>canvas画框</title>
 
   <style>
+    html,
     body {
-      background: #dfdfdf;
-    }
-
-    #rect-canvas {
       background: #fff;
+      height: 100%;
     }
   </style>
 </head>
 
 <body>
 
-  <div style="margin: 20px auto;width: 1200px;">
-    <canvas id="rect-canvas" width="1200" height="570"></canvas>
+  <div style="margin: 20px auto;width: 1200px;padding: 0;">
+    <canvas id="rect-canvas" style="position:absolute;top:0;left:0;" width="1200" height="720">
+    </canvas>
+    <img style="width:1200px;height:720px" src="./device.jpg" alt />
   </div>
 
-  <button onclick="setting()">设置</button>
-  <button onclick="submit()">提交</button>
+  <div style="text-align: center;">
+    <button id="setting">设置</button>
+    <button id="submit">提交</button>
+  </div>
 
-  <!-- <script src="./addEvent.js"></script> -->
-  <script src="./canvas.js"></script>
+  <script type="module" src="./canvas.js"></script>
 
-  <script>
+  <script type="module">
+    import Canvas from "./canvas.js";
+
     let canvas = new Canvas(document.getElementById("rect-canvas"))
+
+    canvas.on("change", rects => {
+      console.log(rects)
+    })
 
     function setting() {
       console.log(canvas.setRects([
@@ -43,6 +50,9 @@
     function submit() {
       console.log(canvas.getRects())
     }
+
+    document.getElementById("setting").addEventListener("click", setting)
+    document.getElementById("submit").addEventListener("click", submit)
   </script>
 </body>
 
