@@ -1,14 +1,12 @@
 
 /**
- * 缩放的动作对象
- * @typedef Action
+ * 
+ * @typedef Action 缩放的动作对象
  * @property {string} Action.position 缩放的方向
  * @property {string[]} Action.changePointers 改变的坐标点
  * @property {Function} Action.handler 处理函数
  * 
- * 
- * 配置内容
- * @typedef ContextOptions
+ * @typedef ContextOptions 配置内容
  * @property {number} ContextOptions.lineWidth 线条宽度
  * @property {string} ContextOptions.strokeStyle 线条颜色
  * @property {string} ContextOptions.fillStyle 填充颜色
@@ -23,7 +21,6 @@
  * @property {"start"|"end"|"center"|"left"|"right"} ContextOptions.textAlign 文本内容的当前对齐方式
  * @property {"alphabetic"|"top"|"hanging"|"middle"|"ideographic"|"bottom"} ContextOptions.textBaseline 绘制文本时使用的当前文本基线
  *
- * 
  * @typedef CrosshairOptions 十字线配置
  * @property {number} CrosshairOptions.width 十字线宽度
  * @property {string} CrosshairOptions.stroke 十字线颜色
@@ -35,12 +32,55 @@
  * @property {string} CrosshairOptions.strokeActive 线框在活动时的颜色
  * @property {string} CrosshairOptions.fillActive 线框在活动时的填充颜色
  * 
- * 配置内容
- * @typedef Options
+ * @typedef Options 配置内容
  * @property {CrosshairOptions} CrosshairOptions.crosshair 十字线配置
  * @property {RectOptions} CrosshairOptions.rect 线框配置
  * @property {number} CrosshairOptions.ignoreSize 被忽略的线框大小
  */
+
+/**
+ * 事件类型
+ */
+const EventTypes = {
+  // 绘画事件
+  drawRect: "DrawRect",
+  // 拖动事件
+  dragRect: "DragRect",
+  // 缩放事件
+  zoomRect: "ZoomRect",
+}
+
+/**
+ * 默认配置
+ * @type {Options}
+ */
+const defaultOptions = {
+  crosshair: {
+    width: 2,
+    stroke: "red"
+  },
+  rect: {
+    width: 2,
+    stroke: "red",
+    strokeActive: "#fea26f",
+    fill: "transparent",
+    fillActive: "rgba(240, 0, 0, 0.1)"
+  },
+  ignoreSize: 64
+}
+
+
+/**
+ * 设置style样式
+ * @param {HTMLElement} elem 
+ * @param {Object} style 
+ */
+function setStyle(elem, style) {
+  Object.keys(style).forEach(key => {
+    let val = style[key]
+    elem.style[key] = val
+  })
+}
 
 
 /**
@@ -70,44 +110,6 @@ class EventBus {
       cbs.forEach(cb => cb(payLoad))
     }
   }
-}
-
-// 事件类型
-const EventTypes = {
-  drawRect: "DrawRect",
-  dragRect: "DragRect",
-  zoomRect: "ZoomRect",
-}
-
-/**
- * 设置style样式
- * @param {HTMLElement} elem 
- * @param {Object} style 
- */
-function setStyle(elem, style) {
-  Object.keys(style).forEach(key => {
-    let val = style[key]
-    elem.style[key] = val
-  })
-}
-
-/**
- * 默认配置
- * @type {Options}
- */
-const defaultOptions = {
-  crosshair: {
-    width: 2,
-    stroke: "red"
-  },
-  rect: {
-    width: 2,
-    stroke: "red",
-    strokeActive: "#fea26f",
-    fill: "transparent",
-    fillActive: "rgba(240, 0, 0, 0.1)"
-  },
-  ignoreSize: 64
 }
 
 /**
@@ -189,7 +191,7 @@ export default class Canvas extends EventBus {
    * 配置项
    * @type {Options}
    */
-  options
+  options = { ...defaultOptions }
 
   /**
    * 缩放动作
@@ -208,20 +210,24 @@ export default class Canvas extends EventBus {
    * @param {HTMLCanvasElement} elem canvas元素
    * @param {Options} options 配置内容
    */
-  constructor(elem, options = defaultOptions) {
+  constructor(elem, options) {
     super()
     this.canvasElem = elem
     // 保存配置内容
-    this.options = { ...options }
+    this.setOptions(options)
     // 设置CSS样式
     setStyle(elem, {
       cursor: "crosshair",
       color: "#fff",
       userSelect: "none",
-      "z-index": 2
     })
+    if (!(window.getComputedStyle(elem).zIndex > 1)) {
+      setStyle(elem, {
+        "z-index": 2
+      })
+    }
 
-    const Crosshair = createCrosshair(elem, options)
+    const Crosshair = createCrosshair(elem, this.options)
 
     this.ctx = elem.getContext("2d")
 
@@ -371,6 +377,7 @@ export default class Canvas extends EventBus {
    * @param {Options} options 
    */
   setOptions(options) {
+    if (!options) return
     /**
      * 设置值
      * @param {any} target 目标对象
